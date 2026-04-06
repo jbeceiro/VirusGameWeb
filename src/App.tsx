@@ -5,6 +5,7 @@ import HomeScreen from './screens/HomeScreen'
 import LobbyScreen from './screens/LobbyScreen'
 import GameScreen from './screens/GameScreen'
 import SinglePlayerGameScreen from './screens/SinglePlayerGameScreen'
+import StatsScreen from './screens/StatsScreen'
 
 type Screen =
   | { name: 'LOGIN' }
@@ -12,6 +13,7 @@ type Screen =
   | { name: 'LOBBY'; code: string }
   | { name: 'GAME'; code: string }
   | { name: 'SINGLE_PLAYER' }
+  | { name: 'STATS' }
 
 export default function App() {
   const { user, loading, signInWithGoogle, signOutUser } = useAuth()
@@ -59,12 +61,22 @@ export default function App() {
     )
   }
 
+  if (screen.name === 'STATS') {
+    return (
+      <StatsScreen
+        user={user}
+        onBack={() => setScreen({ name: 'HOME' })}
+      />
+    )
+  }
+
   return (
     <HomeScreen
       user={user}
       onRoomCreated={code => setScreen({ name: 'LOBBY', code })}
       onRoomJoined={code => setScreen({ name: 'LOBBY', code })}
       onSinglePlayer={() => setScreen({ name: 'SINGLE_PLAYER' })}
+      onStats={() => setScreen({ name: 'STATS' })}
       onSignOut={async () => { await signOutUser(); setScreen({ name: 'LOGIN' }) }}
     />
   )

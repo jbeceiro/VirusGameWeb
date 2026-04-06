@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { User } from 'firebase/auth'
 import { observeRoom, observeGameState, updateGameState, leaveRoom, type GameRoom } from '../firebase/gameRepository'
+import { recordGameResult } from '../firebase/statsRepository'
 import { applyAction, endTurn } from '../engine/gameEngine'
 import type { GameState, Card, GameAction } from '../engine/types'
 
@@ -21,13 +22,20 @@ export function useGame(roomCode: string, user: User) {
     gameState: null, playerNames: {}, selectedCard: null, showDiscardMode: false,
     cardsToDiscard: [], gameOver: false, winnerName: null, error: null, transplantFirstTarget: null,
   })
+  const statsRecordedRef = useRef(false)
 
   useEffect(() => {
     const unsub1 = observeRoom(roomCode, (room: GameRoom | null) => {
       if (room) setUi(prev => ({ ...prev, playerNames: Object.fromEntries(room.players.map(p => [p.id, p.name])) }))
     })
     const unsub2 = observeGameState(roomCode, gs => {
-      if (gs) setUi(prev => ({ ...prev, gameState: gs, gameOver: !!gs.winner, winnerName: gs.winner ?? null }))
+      if (gs) {
+        if (gs.winner && !statsRecordedRef.current) {
+          statsRecordedRef.current = true
+          recordGameResult(user.uid, gs.winner === user.uid)
+        }
+        setUi(prev => ({ ...prev, gameState: gs, gameOver: !!gs.winner, winnerName: gs.winner ?? null }))
+      }
     })
     return () => { unsub1(); unsub2() }
   }, [roomCode])

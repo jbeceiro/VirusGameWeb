@@ -7,10 +7,11 @@ interface Props {
   onRoomCreated: (code: string) => void
   onRoomJoined: (code: string) => void
   onSinglePlayer: () => void
+  onStats: () => void
   onSignOut: () => void
 }
 
-export default function HomeScreen({ user, onRoomCreated, onRoomJoined, onSinglePlayer, onSignOut }: Props) {
+export default function HomeScreen({ user, onRoomCreated, onRoomJoined, onSinglePlayer, onStats, onSignOut }: Props) {
   const { isLoading, error, joinCode, setJoinCode, handleCreateRoom, handleJoinRoom, clearError } = useHome(user)
   const [showJoinModal, setShowJoinModal] = useState(false)
   const firstName = user.displayName?.split(' ')[0] ?? 'Jugador'
@@ -55,6 +56,10 @@ export default function HomeScreen({ user, onRoomCreated, onRoomJoined, onSingle
         <button onClick={onSinglePlayer}
           className="w-full h-14 border-2 border-indigo-400 text-indigo-400 hover:bg-indigo-400/10 font-bold rounded-full text-base transition-colors">
           🤖 Jugar vs IA
+        </button>
+        <button onClick={onStats}
+          className="w-full h-12 text-white/50 hover:text-white/80 font-medium text-sm transition-colors">
+          📊 Ver mis estadísticas
         </button>
       </div>
 

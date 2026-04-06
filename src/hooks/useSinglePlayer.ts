@@ -3,6 +3,7 @@ import type { User } from 'firebase/auth'
 import { applyAction, endTurn } from '../engine/gameEngine'
 import { decideTurn } from '../engine/aiPlayer'
 import { initGame } from '../engine/gameEngine'
+import { recordGameResult } from '../firebase/statsRepository'
 import type { GameState, Card, GameAction } from '../engine/types'
 import type { GameUiState } from './useGame'
 
@@ -15,6 +16,7 @@ export function useSinglePlayer(user: User) {
     cardsToDiscard: [], gameOver: false, winnerName: null, error: null, transplantFirstTarget: null,
   })
   const startedRef = useRef(false)
+  const statsRecordedRef = useRef(false)
 
   const myId = user.uid
   const myName = user.displayName ?? 'Jugador'
@@ -28,6 +30,7 @@ export function useSinglePlayer(user: User) {
 
   const reset = () => {
     startedRef.current = false
+    statsRecordedRef.current = false
     setUi({ gameState: null, playerNames: {}, selectedCard: null, showDiscardMode: false, cardsToDiscard: [], gameOver: false, winnerName: null, error: null, transplantFirstTarget: null })
   }
 
@@ -68,6 +71,10 @@ export function useSinglePlayer(user: User) {
           return end.ok ? { ...end.newState, lastActionLog: stateAfter.lastActionLog } : stateAfter
         })()
       : stateAfter
+    if (finalState.winner && !statsRecordedRef.current) {
+      statsRecordedRef.current = true
+      recordGameResult(myId, finalState.winner === myId)
+    }
     return { ...prev, gameState: finalState, gameOver: !!finalState.winner, winnerName: finalState.winner ?? null }
   }
 
