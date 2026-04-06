@@ -55,7 +55,7 @@ export default function GameScreen({ roomCode, user, onGameEnd }: Props) {
         />
       )}
 
-      <TopGameBar gs={gs} myId={myId} playerNames={playerNames} />
+      <TopGameBar gs={gs} myId={myId} playerNames={playerNames} onLeave={() => { handleLeave(); onGameEnd() }} />
 
       {/* Opponents */}
       <div className="flex gap-2 overflow-x-auto px-2 py-1">

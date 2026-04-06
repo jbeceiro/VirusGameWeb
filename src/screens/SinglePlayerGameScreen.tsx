@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import type { User } from 'firebase/auth'
 import { useSinglePlayer } from '../hooks/useSinglePlayer'
+import { recordGameResult } from '../firebase/statsRepository'
 import { getOrganState, colorsCompatible } from '../engine/types'
 import type { Card } from '../engine/types'
 import TopGameBar from '../components/TopGameBar'
@@ -55,7 +56,7 @@ export default function SinglePlayerGameScreen({ user, onGameEnd }: Props) {
         />
       )}
 
-      <TopGameBar gs={gs} myId={myId} playerNames={playerNames} />
+      <TopGameBar gs={gs} myId={myId} playerNames={playerNames} onLeave={() => { recordGameResult(myId, false); reset(); onGameEnd() }} />
 
       <div className="flex gap-2 overflow-x-auto px-2 py-1">
         {otherPlayers.map(pid => {
