@@ -35,6 +35,13 @@ export function useSinglePlayer(user: User) {
   }
 
   useEffect(() => {
+    if (ui.winnerName && !statsRecordedRef.current) {
+      statsRecordedRef.current = true
+      recordGameResult(myId, ui.winnerName === myId)
+    }
+  }, [ui.winnerName])
+
+  useEffect(() => {
     const gs = ui.gameState
     if (!gs || gs.winner) return
     const currentId = gs.playerOrder[gs.currentPlayerIndex]
@@ -71,10 +78,6 @@ export function useSinglePlayer(user: User) {
           return end.ok ? { ...end.newState, lastActionLog: stateAfter.lastActionLog } : stateAfter
         })()
       : stateAfter
-    if (finalState.winner && !statsRecordedRef.current) {
-      statsRecordedRef.current = true
-      recordGameResult(myId, finalState.winner === myId)
-    }
     return { ...prev, gameState: finalState, gameOver: !!finalState.winner, winnerName: finalState.winner ?? null }
   }
 
