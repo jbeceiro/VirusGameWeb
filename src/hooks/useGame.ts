@@ -34,7 +34,7 @@ export function useGame(roomCode: string, user: User) {
           statsRecordedRef.current = true
           recordGameResult(user.uid, gs.winner === user.uid)
         }
-        setUi(prev => ({ ...prev, gameState: gs, gameOver: !!gs.winner, winnerName: gs.winner ?? null }))
+        setUi(prev => ({ ...prev, gameState: gs, gameOver: !!gs.winner, winnerName: prev.winnerName ?? (gs.winner ? (prev.playerNames[gs.winner] ?? gs.winner) : null) }))
       }
     })
     return () => { unsub1(); unsub2() }
